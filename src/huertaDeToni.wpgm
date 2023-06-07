@@ -7,29 +7,56 @@ program huertaDeToni {
 	game.width(15)
 	game.height(15)
 	
-	// Configuramos una imagen de fondo, que se repite para cada celda del tablero.
 	game.ground("tierra.png")
 	
-	// Agregamos al amigo Toni.
-	game.addVisual(toni)
+	game.addVisualCharacter(toni)
 	
-	/*
-	 * Acá usamos addVisualIn en vez de addVisual, y por esto 
-	 * no es necesario que la pachamama conozca su position.
-	 */
-	game.addVisualIn(pachamama, game.at(0, 13));
 	
-	/* 
-	 * Agregamos una fila de maices. Ojo al regar, que Toni no va a conocer
-	 * estas plantas.
-	 * 
-	 * En este ejemplo también usamos addVisualIn, por lo tanto
-	 * el Maiz solo define la imagen.
-	 * 
-	 * De yapa, mostramos cómo agregar varios objetos de una utilizando
-	 * un rango (1..13), que equivale a la lista [1, 2, 3, ..., 13].
-	 */
-	(1..13).forEach { x => game.addVisualIn(new Maiz(), game.at(x, 5)) }
+	game.addVisual(pachamama);
+	
+	
+	(1..13).forEach { x =>
+		const maiz = new Maiz()
+		toni.plantar(maiz) 
+		game.addVisualIn(maiz, game.at(x, 5))
+	}
+	(1..13).forEach { x => 
+		const trigo = new Trigo()
+		toni.plantar(trigo)
+		game.addVisualIn(trigo, game.at(x, 4))
+	}
+	
+	keyboard.t().onPressDo {
+		const trigo = new Trigo()
+		toni.plantar(trigo)
+		game.addVisualIn(trigo, toni.position())
+	}
+	
+	keyboard.m().onPressDo {
+		const maiz = new Maiz()
+		toni.plantar(maiz) 
+		game.addVisualIn(maiz, toni.position())
+	}
+	
+	
+	keyboard.r().onPressDo {
+		game.colliders(toni).forEach {planta => toni.regar(planta)}
+	}
+	
+	keyboard.a().onPressDo {
+		toni.regarLasPlantas()
+	}
+	
+	keyboard.z().onPressDo {
+		pachamama.tirarBasura()
+	}
+	
+	keyboard.x().onPressDo {
+		const listas = toni.plantasListasParaCosechar()
+		toni.cosecharTodo(listas)
+		listas.forEach { lista => game.removeVisual(lista) }
+	}
+	
 		
 	game.start()
 }
